@@ -9,16 +9,21 @@
         <label>Email:</label>
         <input type="text" v-model="user.email" placeholder="Informe seu email...">
         <label>Crie sua senha:</label>
-        <input type="text" v-model="user.password" placeholder="Informe sua senha...">
+        <input type="password" v-model="user.password" placeholder="Informe sua senha...">
         <label>Telefone / Celular:</label>
         <input type="text" v-model="user.phone" placeholder="(12) 99999-9999">
         <button>Cadastrar</button>
+        <a href="/list">
+        Ver registros
+        </a>
       </form>
     </div>
   </div>
 </template>
 
 <script>
+  import axios from 'axios';
+
   export default {
     data() {
       return {
@@ -37,15 +42,13 @@
         this.user.password = ''
         this.user.phone = ''
       },
-      storeUser({ currents, user }) {
-        if (currents) {
-          const newUsers = [...currents, user];
-
-          localStorage.setItem('#res_users', JSON.stringify(newUsers))
-          return;
-        }
-
-        localStorage.setItem('#res_users', JSON.stringify([user]))
+      storeUser({ user }) {
+        axios.post('https://resuolve-backend.herokuapp.com/resuolve/usuario/cadastrar', {
+          "nome": user.name,
+          "email": user.email,
+          "telefone": user.phone,
+          "senha": user.password
+        })
       },
       onSubmit(e) {
         e.preventDefault();
@@ -57,15 +60,13 @@
           phone: this.user.phone,
         }
 
-        const users = JSON.parse(localStorage.getItem('#res_users'))
-
         if(!user.name || !user.email || !user.password || !user.phone) {
           alert('Verifique se todos os campos estão preenchidos')
           return
         }
 
         this.cleanForm();
-        this.storeUser({currents: users, user});
+        this.storeUser({ user });
       }
     }
   }
@@ -80,7 +81,6 @@
     min-height: 100vh;
     height: 100%;
 
-    border: 1px solid red;
     padding: 107px 30px 30px;
   }
 
